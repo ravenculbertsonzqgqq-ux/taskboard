@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务台 · 入口</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: linear-gradient(160deg, #1f2440 0%, #2d325a 100%); color: #f4f4f5; padding: 24px;
+  }
+  .card {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 16px; padding: 36px 32px; max-width: 420px; width: 100%;
+    text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.35); backdrop-filter: blur(6px);
+  }
+  .icon { font-size: 44px; }
+  h1 { font-size: 22px; margin: 12px 0 4px; font-weight: 600; }
+  p.sub { font-size: 13px; opacity: .75; margin-bottom: 20px; }
+  .status { font-size: 14px; opacity: .9; margin: 14px 0 6px; min-height: 1.4em; }
+  a.btn {
+    display: inline-block; margin-top: 10px; padding: 12px 28px; border-radius: 10px;
+    background: #6c8cff; color: #fff; text-decoration: none; font-size: 16px; font-weight: 600;
+  }
+  a.btn:hover { background: #5a7bef; }
+  .meta { margin-top: 18px; font-size: 12px; opacity: .6; line-height: 1.7; }
+  .err { color: #ffb4b4; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📋</div>
+    <h1>任务台</h1>
+    <p class="sub">稳定入口 · 指向当前公网隧道</p>
+    <p class="status" id="status">正在获取最新地址…</p>
+    <a class="btn" id="openBtn" href="#" style="display:none">打开任务台</a>
+    <div class="meta">
+      <div id="updated"></div>
+      <div>登录需要账号密码；本页不收集任何信息。</div>
+      <div>若打不开，说明隧道已重启，请通知站长更新地址。</div>
+    </div>
+  </div>
+<script>
+(async function () {
+  var statusEl = document.getElementById('status');
+  var btn = document.getElementById('openBtn');
+  var updatedEl = document.getElementById('updated');
+  try {
+    var r = await fetch('./link.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var cfg = await r.json();
+    if (!cfg.url) throw new Error('link.json 中没有 url');
+    updatedEl.textContent = '地址更新时间：' + (cfg.updated || '未知');
+    btn.href = cfg.url;
+    btn.style.display = 'inline-block';
+    statusEl.textContent = '即将前往：' + cfg.url.replace(/^https?:\/\//, '');
+    setTimeout(function () { window.location.replace(cfg.url); }, 1500);
+  } catch (e) {
+    statusEl.innerHTML = '<span class="err">未能获取最新地址（' + (e.message || e) + '）</span><br>请通知站长更新任务台地址。';
+  }
+})();
+</script>
+</body>
+</html>
