@@ -1,0 +1,5 @@
+{
+  "url": "https://amy-kidney-parking-centuries.trycloudflare.com",
+  "updated": "2026-11-18 23:50",
+  "note": "cloudflared 快速隧道；重启后域名会变化，需要重新生成并更新本文件"
+}
